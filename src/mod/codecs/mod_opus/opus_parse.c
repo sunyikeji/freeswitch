@@ -175,7 +175,7 @@ static bool_t switch_opus_get_VAD_LBRR_flags(const uint8_t *buf, opus_int16 silk
  * RFC6716: Definition of the Opus Audio Codec
  * return: FALSE if there was a problem found parsing the packet, the info returned should be ignored.
  * */
-bool_t switch_opus_packet_parse(const uint8_t *payload, int payload_length_bytes, opus_packet_info_t *packet_info, bool_t debug)
+bool_t switch_opus_packet_parse(const uint8_t *payload, int payload_length_bytes, opus_packet_info_t *packet_info, switch_bool_t debug)
 {
 	int f;
 	int32_t samplerate;
