@@ -446,6 +446,7 @@ SWITCH_DECLARE(switch_status_t) _switch_cache_db_get_db_handle_dsn_ex(switch_cac
 	{
 		char prefix[16] = "";
 		strncpy(prefix, dsn, MIN(colon_slashes - dsn, 15));
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "_switch_cache_db_get_db_handle_dsn_ex prefix=[%s]\n", prefix);//hhbb add 2024-05-08
 
 		if ((database_interface = switch_loadable_module_get_database_interface(prefix, NULL))) {
 			type = SCDB_TYPE_DATABASE_INTERFACE;
@@ -1430,19 +1431,22 @@ SWITCH_DECLARE(switch_bool_t) switch_cache_db_test_reactive_ex(switch_cache_db_h
 {
 	switch_bool_t r = SWITCH_TRUE;
 
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "switch_cache_db_test_reactive_ex: [%s]\n[%s]\n[%s]\n", test_sql, drop_sql, reactive_sql);//hhbb add 2024-05-08
 	switch_assert(test_sql != NULL);
 	switch_assert(reactive_sql != NULL);
 
 	if (!switch_test_flag((&runtime), SCF_CLEAR_SQL)) {
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "auto-clear-sql=false\n");//hhbb add 2024-05-08
 		return SWITCH_TRUE;
 	}
 
 	if (!switch_test_flag((&runtime), SCF_AUTO_SCHEMAS)) {
 		switch_status_t status = switch_cache_db_execute_sql(dbh, (char *)test_sql, NULL);
-
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "auto-create-schemas=false,status=[%d]\n", status);//hhbb add 2024-05-08
 		return (status == SWITCH_STATUS_SUCCESS) ? SWITCH_TRUE : SWITCH_FALSE;
 	}
 
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "switch_cache_db_test_reactive_ex: dbh->type=[%d]\n", dbh->type);//hhbb add 2024-05-08
 	switch (dbh->type) {
 	case SCDB_TYPE_DATABASE_INTERFACE:
 		{
@@ -1489,13 +1493,14 @@ SWITCH_DECLARE(switch_bool_t) switch_cache_db_test_reactive_ex(switch_cache_db_h
 		{
 			char *errmsg = NULL;
 			switch_core_db_exec(dbh->native_handle.core_db_dbh->handle, test_sql, NULL, NULL, &errmsg);
-
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "switch_core_db_exec: errmsg=[%s],test_sql=[%s]\n", errmsg, test_sql);//hhbb add 2024-05-08
 			if (errmsg) {
 				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "SQL ERR [%s]\n[%s]\nAuto Generating Table!\n", errmsg, test_sql);
 				switch_core_db_free(errmsg);
 				errmsg = NULL;
 				if (drop_sql) {
 					switch_core_db_exec(dbh->native_handle.core_db_dbh->handle, drop_sql, NULL, NULL, &errmsg);
+					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "switch_core_db_exec: errmsg=[%s],drop_sql=[%s]\n", errmsg, drop_sql);//hhbb add 2024-05-08
 				}
 				if (errmsg) {
 					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "Ignoring SQL ERR [%s]\n[%s]\n", errmsg, drop_sql);
@@ -1503,6 +1508,7 @@ SWITCH_DECLARE(switch_bool_t) switch_cache_db_test_reactive_ex(switch_cache_db_h
 					errmsg = NULL;
 				}
 				switch_core_db_exec(dbh->native_handle.core_db_dbh->handle, reactive_sql, NULL, NULL, &errmsg);
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "switch_core_db_exec: errmsg=[%s],drop_sql=[%s]\n", errmsg, reactive_sql);//hhbb add 2024-05-08
 				if (errmsg) {
 					r = SWITCH_FALSE;
 					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "SQL ERR [%s]\n[%s]\n", errmsg, reactive_sql);
@@ -1516,6 +1522,7 @@ SWITCH_DECLARE(switch_bool_t) switch_cache_db_test_reactive_ex(switch_cache_db_h
 		break;
 	}
 
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "switch_cache_db_test_reactive_ex: return=[%d]\n", r);//hhbb add 2024-05-08
 	return r;
 }
 
