@@ -703,7 +703,7 @@ static switch_status_t switch_cache_db_execute_sql_real(switch_cache_db_handle_t
 	case SCDB_TYPE_ODBC:
 		{
 			type = "ODBC";
-			status = switch_odbc_handle_exec(dbh->native_handle.odbc_dbh, sql, NULL, &errmsg);
+			status = switch_odbc_handle_exec(dbh->native_handle.odbc_dbh, sql, NULL, &errmsg) == SWITCH_ODBC_SUCCESS ? SWITCH_STATUS_SUCCESS : SWITCH_STATUS_FALSE;
 		}
 		break;
 	case SCDB_TYPE_CORE_DB:
@@ -905,7 +905,7 @@ SWITCH_DECLARE(char *) switch_cache_db_execute_sql2str(switch_cache_db_handle_t 
 		break;
 	case SCDB_TYPE_ODBC:
 		{
-			status = switch_odbc_handle_exec_string(dbh->native_handle.odbc_dbh, sql, str, len, err);
+			status = switch_odbc_handle_exec_string(dbh->native_handle.odbc_dbh, sql, str, len, err) == SWITCH_ODBC_SUCCESS ? SWITCH_STATUS_SUCCESS : SWITCH_STATUS_FALSE;
 		}
 		break;
 	case SCDB_TYPE_DATABASE_INTERFACE:
@@ -1190,7 +1190,7 @@ SWITCH_DECLARE(switch_status_t) switch_cache_db_execute_sql_event_callback(switc
 		break;
 	case SCDB_TYPE_ODBC:
 		{
-			status = switch_odbc_handle_callback_exec(dbh->native_handle.odbc_dbh, sql, helper_callback, &h, err);
+			status = switch_odbc_handle_callback_exec(dbh->native_handle.odbc_dbh, sql, helper_callback, &h, err) == SWITCH_ODBC_SUCCESS ? SWITCH_STATUS_SUCCESS : SWITCH_STATUS_FALSE;
 		}
 		break;
 	case SCDB_TYPE_CORE_DB:
@@ -1249,7 +1249,7 @@ SWITCH_DECLARE(switch_status_t) switch_cache_db_execute_sql_event_callback_err(s
 		break;
 	case SCDB_TYPE_ODBC:
 		{
-			status = switch_odbc_handle_callback_exec(dbh->native_handle.odbc_dbh, sql, helper_callback, &h, err);
+			status = switch_odbc_handle_callback_exec(dbh->native_handle.odbc_dbh, sql, helper_callback, &h, err) == SWITCH_ODBC_SUCCESS ? SWITCH_STATUS_SUCCESS : SWITCH_STATUS_FALSE;
 			if (err && *err) {
 				(*err_callback)(pdata, (const char*)*err);
 			}
@@ -1306,7 +1306,7 @@ SWITCH_DECLARE(switch_status_t) switch_cache_db_execute_sql_callback(switch_cach
 		break;
 	case SCDB_TYPE_ODBC:
 		{
-			status = switch_odbc_handle_callback_exec(dbh->native_handle.odbc_dbh, sql, callback, pdata, err);
+			status = switch_odbc_handle_callback_exec(dbh->native_handle.odbc_dbh, sql, callback, pdata, err) == SWITCH_ODBC_SUCCESS ? SWITCH_STATUS_SUCCESS : SWITCH_STATUS_FALSE;
 		}
 		break;
 	case SCDB_TYPE_CORE_DB:
@@ -1359,7 +1359,7 @@ SWITCH_DECLARE(switch_status_t) switch_cache_db_execute_sql_callback_err(switch_
 		break;
 	case SCDB_TYPE_ODBC:
 		{
-			status = switch_odbc_handle_callback_exec(dbh->native_handle.odbc_dbh, sql, callback, pdata, err);
+			status = switch_odbc_handle_callback_exec(dbh->native_handle.odbc_dbh, sql, callback, pdata, err) == SWITCH_ODBC_SUCCESS ? SWITCH_STATUS_SUCCESS : SWITCH_STATUS_FALSE;
 			if (err && *err) {
 				(*err_callback)(pdata, (const char*)*err);
 			}
@@ -2072,6 +2072,7 @@ static uint32_t do_trans(switch_sql_queue_manager_t *qm)
 	switch_status_t status;
 	uint32_t ttl = 0;
 	uint32_t i;
+	switch_status_t res;
 
 	if (!zstr(qm->pre_trans_execute)) {
 		switch_cache_db_execute_sql_real(qm->event_db, qm->pre_trans_execute, &errmsg);
@@ -2133,7 +2134,8 @@ static uint32_t do_trans(switch_sql_queue_manager_t *qm)
 
 		for (i = 0; (qm->max_trans == 0 || ttl <= qm->max_trans) && (i < qm->numq); i++) {
 			switch_mutex_lock(qm->mutex);
-			switch_queue_trypop(qm->sql_queue[i], &pop);
+			res = switch_queue_trypop(qm->sql_queue[i], &pop);
+			(void)res;
 			switch_mutex_unlock(qm->mutex);
 			if (pop) break;
 		}
@@ -2145,6 +2147,7 @@ static uint32_t do_trans(switch_sql_queue_manager_t *qm)
 				switch_mutex_unlock(qm->mutex);
 				ttl++;
 			}
+
 			switch_safe_free(pop);
 			if (status != SWITCH_STATUS_SUCCESS) break;
 		} else {
@@ -2159,7 +2162,6 @@ static uint32_t do_trans(switch_sql_queue_manager_t *qm)
 			switch_safe_free(errmsg);
 		}
 	}
-
 
  end:
 
@@ -2197,11 +2199,11 @@ static uint32_t do_trans(switch_sql_queue_manager_t *qm)
 		}
 	}
 
-
 	switch_mutex_lock(qm->mutex);
 	for (i = 0; i < qm->numq; i++) {
 		qm->written[i] = qm->pre_written[i];
 	}
+
 	switch_mutex_unlock(qm->mutex);
 
 	return ttl;
