@@ -4799,6 +4799,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 	int got_audio_rtcp = 0, got_video_rtcp = 0;
 	switch_port_t audio_port = 0, video_port = 0;
 
+	switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "switch_core_media_negotiate_sdp begin [%d][%s]\n", sdp_type, r_sdp);//hhbb add
 	switch_assert(session);
 
 	if (!r_sdp) {
@@ -4807,6 +4808,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 	}
 
 	if (!(smh = session->media_handle)) {
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_WARNING, "session->media_handle null\n");//hhbb add
 		return 0;
 	}
 
@@ -4821,11 +4823,13 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 	total_codecs = smh->mparams->num_codecs;
 
 	if (!(parser = sdp_parse(NULL, r_sdp, (int) strlen(r_sdp), 0))) {
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_WARNING, "sdp_parse false\n");//hhbb add
 		return 0;
 	}
 
 	if (!(sdp = sdp_session(parser))) {
 		sdp_parser_free(parser);
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_WARNING, "sdp_session false\n");
 		return 0;
 	}
 
@@ -6289,7 +6293,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 	}
 
  endsdp:
-
+	switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "endsdp: rtcp_auto_audio=[%d],rtcp_auto_video=[%d],saw_audio=[%d]\n",rtcp_auto_audio, rtcp_auto_video, saw_audio);//hhbb add
 	if (rtcp_auto_audio || rtcp_auto_video) {
 		if (rtcp_auto_audio && !skip_rtcp && !got_audio_rtcp && audio_port) {
 			switch_channel_set_variable_printf(session->channel, "rtp_remote_audio_rtcp_port", "%d", audio_port + 1);
@@ -6340,7 +6344,9 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 
  done:
 
+	switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "done:\n");//hhbb add
 	if (v_engine->rtp_session) {
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "done: rtp_session\n");//hhbb add
 		if (v_engine->fir) {
 			switch_rtp_set_flag(v_engine->rtp_session, SWITCH_RTP_FLAG_FIR);
 		} else {
@@ -6407,7 +6413,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 	smh->mparams->cng_rate = cng_rate;
 
 	check_stream_changes(session, r_sdp, sdp_type);
-
+	switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "switch_core_media_negotiate_sdp match=[%d],vmatch=[%d],tmatch=[%d],fmatch=[%d]\n", match, vmatch, tmatch, fmatch);//hhbb add
 	return match || vmatch || tmatch || fmatch;
 }
 

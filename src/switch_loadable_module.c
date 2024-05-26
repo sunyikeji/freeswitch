@@ -2540,7 +2540,8 @@ SWITCH_DECLARE(switch_database_interface_t *) switch_loadable_module_get_databas
 	switch_mutex_unlock(loadable_modules.mutex);
 
 	if (i) PROTECT_INTERFACE(i);
-
+	if (i) switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG10, "switch_loadable_module_get_database_interface return[%s]\n", i->interface_name);//hhbb add 2024-05-08
+	else switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "switch_loadable_module_get_database_interface return null\n");//hhbb add 2024-05-08
 	return i;
 }
 
