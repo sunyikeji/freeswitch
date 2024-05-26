@@ -2734,7 +2734,7 @@ int sofia_glue_init_sql(sofia_profile_t *profile)
 
 	switch_cache_db_release_db_handle(&dbh);
 
-	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "sofia_glue_init_sql return 1\n");//hhbb add 2024-05-08
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG10, "sofia_glue_init_sql return 1\n");//hhbb add 2024-05-08
 	return 1;
 
 }
@@ -2796,7 +2796,7 @@ switch_cache_db_handle_t *_sofia_glue_get_db_handle(sofia_profile_t *profile, co
 		dsn = profile->dbname;
 	}
 
-	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "_sofia_glue_get_db_handle dsn=[%s]\n", dsn);//hhbb add 2024-05-08
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG10, "_sofia_glue_get_db_handle dsn=[%s]\n", dsn);//hhbb add 2024-05-08
 	if (_switch_cache_db_get_db_handle_dsn(&dbh, dsn, file, func, line) != SWITCH_STATUS_SUCCESS) {
 		dbh = NULL;
 	}

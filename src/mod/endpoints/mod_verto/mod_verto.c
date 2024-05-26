@@ -193,6 +193,7 @@ static int verto_init_ssl(verto_profile_t *profile)
 
 	/* set the local certificate from CertFile */
 	if (!zstr(profile->chain)) {
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "chain file [%s]\n", profile->chain);//hhbb add 2024-05-13
 		if (switch_file_exists(profile->chain, NULL) != SWITCH_STATUS_SUCCESS) {
 			err = "SUPPLIED CHAIN FILE NOT FOUND\n";
 			goto fail;
@@ -204,6 +205,7 @@ static int verto_init_ssl(verto_profile_t *profile)
 		}
 	}
 
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "cert file [%s]\n", profile->cert);//hhbb add 2024-05-13
 	if (switch_file_exists(profile->cert, NULL) != SWITCH_STATUS_SUCCESS) {
 		err = "SUPPLIED CERT FILE NOT FOUND\n";
 		goto fail;
@@ -791,12 +793,14 @@ static jrpc_func_t jrpc_get_func(jsock_t *jsock, const char *method)
 		}
 
 		if (!(switch_event_get_header(jsock->allowed_methods, method) || (main_method && switch_event_get_header(jsock->allowed_methods, main_method)))) {
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "jrpc_get_func no method=[%s]\n", method);//hhbb add 2024-05-13
 			goto end;
 		}
 	}
 
 	switch_mutex_lock(verto_globals.method_mutex);
 	func = (jrpc_func_t) (intptr_t) switch_core_hash_find(verto_globals.method_hash, method);
+	if(func == NULL) switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "jrpc_get_func no method=[%s]\n", method);//hhbb add 2024-05-13
 	switch_mutex_unlock(verto_globals.method_mutex);
 
  end:
@@ -2440,16 +2444,19 @@ switch_status_t verto_tech_media(verto_pvt_t *tech_pvt, const char *r_sdp, switc
 	switch_assert(r_sdp != NULL);
 
 	if (zstr(r_sdp)) {
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "verto_tech_media sdp null\n");//hhbb add
 		return SWITCH_STATUS_FALSE;
 	}
 
 	if (switch_core_media_negotiate_sdp(tech_pvt->session, r_sdp, &p, sdp_type)) {
 		if (switch_core_media_choose_ports(tech_pvt->session, SWITCH_TRUE, SWITCH_FALSE) != SWITCH_STATUS_SUCCESS) {
 		//if (switch_core_media_choose_port(tech_pvt->session, SWITCH_MEDIA_TYPE_AUDIO, 0) != SWITCH_STATUS_SUCCESS) {
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "switch_core_media_choose_ports false\n");//hhbb add
 			return SWITCH_STATUS_FALSE;
 		}
 
 		if (switch_core_media_activate_rtp(tech_pvt->session) != SWITCH_STATUS_SUCCESS) {
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "switch_core_media_activate_rtp false\n");//hhbb add
 			return SWITCH_STATUS_FALSE;
 		}
 		//if (!switch_channel_test_flag(tech_pvt->channel, CF_ANSWERED)) {
@@ -2458,7 +2465,7 @@ switch_status_t verto_tech_media(verto_pvt_t *tech_pvt, const char *r_sdp, switc
 		//}
 		return SWITCH_STATUS_SUCCESS;
 	}
-
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "switch_core_media_negotiate_sdp false [%d][%s]\n",sdp_type, r_sdp);//hhbb add
 
 	return SWITCH_STATUS_FALSE;
 }
@@ -5228,13 +5235,16 @@ static switch_status_t parse_config(const char *cf)
 				} else if (!strcasecmp(var, "secure-combined")) {
 					set_string(profile->cert, val);
 					set_string(profile->key, val);
-					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Secure key and cert specified\n");
+					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Secure key and cert specified[%s]\n",val);
 				} else if (!strcasecmp(var, "secure-cert")) {
 					set_string(profile->cert, val);
+					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Secure cert specified[%s]\n",val);//hhbb add 2024-05-13
 				} else if (!strcasecmp(var, "secure-key")) {
 					set_string(profile->key, val);
+					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Secure key specified[%s]\n",val);//hhbb add 2024-05-13
 				} else if (!strcasecmp(var, "secure-chain")) {
 					set_string(profile->chain, val);
+					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Secure chain specified[%s]\n",val);//hhbb add 2024-05-13
 				} else if (!strcasecmp(var, "inbound-codec-string") && !zstr(val)) {
 					profile->inbound_codec_string = switch_core_strdup(profile->pool, val);
 				} else if (!strcasecmp(var, "outbound-codec-string") && !zstr(val)) {

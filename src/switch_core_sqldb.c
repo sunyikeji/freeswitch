@@ -446,7 +446,7 @@ SWITCH_DECLARE(switch_status_t) _switch_cache_db_get_db_handle_dsn_ex(switch_cac
 	{
 		char prefix[16] = "";
 		strncpy(prefix, dsn, MIN(colon_slashes - dsn, 15));
-		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "_switch_cache_db_get_db_handle_dsn_ex prefix=[%s]\n", prefix);//hhbb add 2024-05-08
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG10, "_switch_cache_db_get_db_handle_dsn_ex prefix=[%s]\n", prefix);//hhbb add 2024-05-08
 
 		if ((database_interface = switch_loadable_module_get_database_interface(prefix, NULL))) {
 			type = SCDB_TYPE_DATABASE_INTERFACE;
@@ -1431,7 +1431,7 @@ SWITCH_DECLARE(switch_bool_t) switch_cache_db_test_reactive_ex(switch_cache_db_h
 {
 	switch_bool_t r = SWITCH_TRUE;
 
-	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "switch_cache_db_test_reactive_ex: [%s]\n[%s]\n[%s]\n", test_sql, drop_sql, reactive_sql);//hhbb add 2024-05-08
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG10, "switch_cache_db_test_reactive_ex: [%s]\n[%s]\n[%s]\n", test_sql, drop_sql, reactive_sql);//hhbb add 2024-05-08
 	switch_assert(test_sql != NULL);
 	switch_assert(reactive_sql != NULL);
 
@@ -1446,7 +1446,7 @@ SWITCH_DECLARE(switch_bool_t) switch_cache_db_test_reactive_ex(switch_cache_db_h
 		return (status == SWITCH_STATUS_SUCCESS) ? SWITCH_TRUE : SWITCH_FALSE;
 	}
 
-	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "switch_cache_db_test_reactive_ex: dbh->type=[%d]\n", dbh->type);//hhbb add 2024-05-08
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG10, "switch_cache_db_test_reactive_ex: dbh->type=[%d]\n", dbh->type);//hhbb add 2024-05-08
 	switch (dbh->type) {
 	case SCDB_TYPE_DATABASE_INTERFACE:
 		{

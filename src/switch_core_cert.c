@@ -201,13 +201,19 @@ SWITCH_DECLARE(int) switch_core_cert_gen_fingerprint(const char *prefix, dtls_fi
 	X509* x509 = NULL;
 	BIO* bio = NULL;
 	int ret = 0;
-	char *rsa;
+	char *rsa = NULL;
 
 	rsa = switch_mprintf("%s%s%s.pem", SWITCH_GLOBAL_dirs.certs_dir, SWITCH_PATH_SEPARATOR, prefix);
-
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "certfile=[%s]\n", rsa);//hhbb add 2024-05-13
 	if (switch_file_exists(rsa, NULL) != SWITCH_STATUS_SUCCESS) {
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "FP FILE ERR![%s]\n", rsa);//hhbb add 2024-05-13
 		free(rsa);
 		rsa = switch_mprintf("%s%s%s.crt", SWITCH_GLOBAL_dirs.certs_dir, SWITCH_PATH_SEPARATOR, prefix);
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "certfile=[%s]\n", rsa);//hhbb add 2024-05-13
+	}
+	if (switch_file_exists(rsa, NULL) != SWITCH_STATUS_SUCCESS) {
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "FP FILE ERR![%s]\n", rsa);//hhbb add 2024-05-13
+		goto end;
 	}
 
 	if (!(bio = BIO_new(BIO_s_file()))) {
@@ -216,7 +222,7 @@ SWITCH_DECLARE(int) switch_core_cert_gen_fingerprint(const char *prefix, dtls_fi
 	}
 
 	if (BIO_read_filename(bio, rsa) != 1) {
-		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "FP FILE ERR!\n");
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "FP FILE ERR![%s]\n", rsa);//hhbb add 2024-05-13
 		goto end;
 	}
 
@@ -239,7 +245,7 @@ SWITCH_DECLARE(int) switch_core_cert_gen_fingerprint(const char *prefix, dtls_fi
 		X509_free(x509);
 	}
 
-	free(rsa);
+	if(rsa) free(rsa);
 
 	return ret;
 }

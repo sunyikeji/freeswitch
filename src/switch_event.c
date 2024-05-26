@@ -836,6 +836,7 @@ SWITCH_DECLARE(switch_event_header_t *) switch_event_get_header_ptr(switch_event
 	hash = switch_ci_hashfunc_default(header_name, &hlen);
 
 	for (hp = event->headers; hp; hp = hp->next) {
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG10, "switch_event_get_header_ptr hp->name=[%s]\n", hp->name);//hhbb add 2024-05-13
 		if ((!hp->hash || hash == hp->hash) && !strcasecmp(hp->name, header_name)) {
 			return hp;
 		}
