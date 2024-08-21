@@ -932,7 +932,7 @@ static int decode_stream_cb(void *dcontext, unsigned char *data, int nbytes)
 
 	if (globals.debug) {
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "[OGG/OPUS Stream Decode] decode CB called: context: %p data: %p packet_len: %d\n", 
-				(void *)context, data, nbytes);
+				(void *)context, (void *)data, nbytes);
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "[OGG/OPUS Stream Decode] decode_stream_cb(): switch_thread_self(): %lx\n", (unsigned long)(intptr_t)switch_thread_self());
 	}
 

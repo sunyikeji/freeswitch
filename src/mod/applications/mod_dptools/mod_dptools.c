@@ -1192,6 +1192,7 @@ SWITCH_STANDARD_APP(transfer_function)
 	int bleg = 0, both = 0;
 
 
+	switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO, "transfer %s %s %s %s\n",argv[0],argv[1], argv[2], argv[3]);//hhbb add
 	if (!zstr(data) && (mydata = switch_core_session_strdup(session, data))) {
 		if (switch_separate_string(mydata, ' ', argv, (sizeof(argv) / sizeof(argv[0]))) >= 1) {
 			bleg = !strcasecmp(argv[0], "-bleg");

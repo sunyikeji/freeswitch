@@ -281,10 +281,12 @@ const char *sofia_glue_get_unknown_header(sip_t const *sip, const char *name)
 	for (un = sip->sip_unknown; un; un = un->un_next) {
 		if (!strcasecmp(un->un_name, name)) {
 			if (!zstr(un->un_value)) {
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "get_unknown_header name=[%s],value=[%s]\n", name, un->un_value); //hhbb add 2024-06-28
 				return un->un_value;
 			}
 		}
 	}
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "get_unknown_header name=[%s],value=NULL\n", name); //hhbb add 2024-06-28
 	return NULL;
 }
 

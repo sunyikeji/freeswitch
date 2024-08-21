@@ -1552,6 +1552,7 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_hold(switch_core_session_t *session, 
 	if (moh && (stream = switch_channel_get_hold_music(channel))) {
 		if ((other_uuid = switch_channel_get_partner_uuid(channel))) {
 			switch_ivr_broadcast(other_uuid, stream, SMF_ECHO_ALEG | SMF_LOOP);
+			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO, "switch_ivr_hold other_uuid=[%s]\n", other_uuid); //hhbb add
 		}
 	}
 
@@ -1559,7 +1560,9 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_hold(switch_core_session_t *session, 
 		switch_channel_event_set_data(channel, event);
 		switch_event_fire(&event);
 	}
-
+	else {
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_WARNING, "switch_ivr_hold switch_event_create false\n"); //hhbb add
+	}
 
 	return SWITCH_STATUS_SUCCESS;
 }
@@ -1572,6 +1575,7 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_hold_uuid(const char *uuid, const cha
 	if ((session = switch_core_session_locate(uuid))) {
 		status = switch_ivr_hold(session, message, moh);
 		switch_core_session_rwunlock(session);
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO, "switch_ivr_hold uuid=[%s], status=[%d]\n", uuid, status); //hhbb add
 	}
 
 	return status;
@@ -1593,6 +1597,7 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_hold_toggle_uuid(const char *uuid, co
 			} else if (callstate == CCS_HELD) {
 				status = switch_ivr_unhold(session);
 			}
+			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO, "hold_toggle_uuid uuid=[%s], callstate=[%d], status=[%d]\n", uuid, callstate, status); //hhbb add
 		}
 		switch_core_session_rwunlock(session);
 	}
@@ -1613,7 +1618,7 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_unhold(switch_core_session_t *session
 
 		callstate = switch_channel_get_callstate(channel);
 		if (callstate != CCS_HELD) {
-			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_WARNING, "Call is not on hold. No need to unhold.\n");
+			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_WARNING, "Call is not on hold. No need to unhold.callstate=[%d]\n", callstate); //hhbb modify
 			return SWITCH_STATUS_FALSE;
 		}
 	}
@@ -1632,12 +1637,16 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_unhold(switch_core_session_t *session
 		switch_channel_stop_broadcast(b_channel);
 		switch_channel_wait_for_flag(b_channel, CF_BROADCAST, SWITCH_FALSE, 5000, NULL);
 		switch_core_session_rwunlock(b_session);
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO, "switch_ivr_unhold other_uuid=[%s]\n", other_uuid); //hhbb add
 	}
 
 
 	if (switch_event_create(&event, SWITCH_EVENT_CHANNEL_UNHOLD) == SWITCH_STATUS_SUCCESS) {
 		switch_channel_event_set_data(channel, event);
 		switch_event_fire(&event);
+	}
+	else {
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_WARNING, "switch_ivr_unhold switch_event_create false\n"); //hhbb add
 	}
 
 	return SWITCH_STATUS_SUCCESS;
@@ -1651,6 +1660,7 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_unhold_uuid(const char *uuid)
 	if ((session = switch_core_session_locate(uuid))) {
 		status = switch_ivr_unhold(session);
 		switch_core_session_rwunlock(session);
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO, "switch_ivr_unhold uuid=[%s], status=[%d]\n", uuid, status); //hhbb add
 	}
 
 	return status;

@@ -1624,7 +1624,8 @@ static void our_sofia_event_callback(nua_event_t event,
 		}
 	}
 
-	switch (event) {
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "our_sofia_event_callback event=%d\n", event); //hhbb add
+	switch(event) {
 	case nua_r_get_params:
 	case nua_i_fork:
 	case nua_r_info:
@@ -2400,6 +2401,7 @@ void sofia_event_callback(nua_event_t event,
 	uint32_t sess_count = switch_core_session_count();
 	uint32_t sess_max = switch_core_session_limit(0);
 
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "sofia_event_callback event=%d\n", event); //hhbb add
 	switch(event) {
 	case nua_i_terminated:
 		if ((status == 401 || status == 407 || status == 403) && sofia_private) {
@@ -4624,7 +4626,7 @@ switch_status_t config_sofia(sofia_config_t reload, char *profile_name)
 
 					profile->pool = pool;
 
-					profile->user_agent = switch_core_sprintf(profile->pool, "FreeSWITCH-mod_sofia/%s", switch_version_full());
+					profile->user_agent = switch_core_sprintf(profile->pool, "dxmediaserver-mod_sofia/%s", switch_version_full());
 
 					profile->sip_user_ping_max = 3;
 					profile->sip_user_ping_min = 1;
@@ -5273,7 +5275,9 @@ switch_status_t config_sofia(sofia_config_t reload, char *profile_name)
 							}
 						} else {
 							switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "Invalid ext-sip-ip\n");
-							switch_goto_status(SWITCH_STATUS_GENERR, done);
+							if (mod_sofia_globals.abort_on_empty_external_ip) { //hhbb add
+								switch_goto_status(SWITCH_STATUS_GENERR, done);
+							}
 						}
 					} else if (!strcasecmp(var, "local-network-acl")) {
 						if (val && !strcasecmp(val, "none")) {

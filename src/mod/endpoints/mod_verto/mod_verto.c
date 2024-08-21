@@ -5176,6 +5176,7 @@ static switch_status_t parse_config(const char *cf)
 	switch_xml_t xvhosts, xvhost, rewrites, rule;
 	switch_status_t status = SWITCH_STATUS_SUCCESS;
 
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "Open file %s\n", cf); //hhbb add
 	if (!(xml = switch_xml_open_cfg(cf, &cfg, NULL))) {
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "Open of %s failed\n", cf);
 		return SWITCH_STATUS_TERM;

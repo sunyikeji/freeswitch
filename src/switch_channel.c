@@ -1958,6 +1958,7 @@ SWITCH_DECLARE(void) switch_channel_set_flag_value(switch_channel_t *channel, sw
 	switch_mutex_lock(channel->flag_mutex);
 	if (flag == CF_LEG_HOLDING && !channel->flags[flag] && channel->flags[CF_ANSWERED]) {
 		HELD = 1;
+		switch_log_printf(SWITCH_CHANNEL_CHANNEL_LOG(channel), SWITCH_LOG_INFO, "HELD=[%d], flag=[%d]\n",HELD, flag); //hhbb add
 	}
 	if (channel->flags[flag] != value) {
 		just_set = 1;
@@ -2007,6 +2008,7 @@ SWITCH_DECLARE(void) switch_channel_set_flag_value(switch_channel_t *channel, sw
 		channel->hold_record = hr;
 
 		switch_mutex_unlock(channel->profile_mutex);
+		switch_log_printf(SWITCH_CHANNEL_CHANNEL_LOG(channel), SWITCH_LOG_INFO, "HELD=[%d], brto=[%s]\n",HELD, brto); //hhbb add
 	}
 
 	if (flag == CF_OUTBOUND) {

@@ -872,6 +872,7 @@ SWITCH_DECLARE(switch_status_t) switch_stun_ip_lookup(char **external_ip, const 
 	switch_memory_pool_t *local_pool = NULL;
 	char *error = "";
 
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "switch_stun_ip_lookup sourceip=[%s]\n", sourceip); //hhbb add
 	if (!sourceip || !external_pool) {
 		*external_ip = NULL;
 		goto end;
@@ -911,7 +912,7 @@ SWITCH_DECLARE(switch_status_t) switch_stun_ip_lookup(char **external_ip, const 
 				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "External ip address detected using STUN: %s\n", ip);
 			}
 			else {
-				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "STUN Failed! [%s]\n", error);
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "STUN Failed! [%s][%s:%d]\n", error,stun_ip,stun_port);
 			}
 		}
 
@@ -928,6 +929,7 @@ SWITCH_DECLARE(switch_status_t) switch_stun_ip_lookup(char **external_ip, const 
 
 end:
 
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "switch_stun_ip_lookup external_ip=[%s]\n", *external_ip); //hhbb add
 	return status;
 }
 

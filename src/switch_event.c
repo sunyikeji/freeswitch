@@ -828,6 +828,7 @@ SWITCH_DECLARE(switch_event_header_t *) switch_event_get_header_ptr(switch_event
 	switch_ssize_t hlen = -1;
 	unsigned long hash = 0;
 
+	if (!event)  return NULL; //hhbb add fixed crash
 	switch_assert(event);
 
 	if (!header_name)
