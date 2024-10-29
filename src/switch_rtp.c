@@ -1584,8 +1584,8 @@ static void do_mos(switch_rtp_t *rtp_session) {
 		
 		if (rtp_session->consecutive_flaws++) {
 			int penalty = rtp_session->consecutive_flaws;
-
-			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(rtp_session->session), SWITCH_LOG_DEBUG3, "%s %s %d consecutive flaws, adding %d flaw penalty\n",
+            // hhbb modified SWITCH_LOG_DEBUG1 -> SWITCH_LOG_DEBUG7
+			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(rtp_session->session), SWITCH_LOG_DEBUG7, "%s %s %d consecutive flaws, adding %d flaw penalty\n",
 							  rtp_session_name(rtp_session), rtp_type(rtp_session),
 							  rtp_session->consecutive_flaws, penalty);
 			rtp_session->bad_stream++;
@@ -1607,8 +1607,8 @@ static void do_mos(switch_rtp_t *rtp_session) {
 
 	rtp_session->stats.inbound.R = R;
 	rtp_session->stats.inbound.mos = 1 + (0.035) * R + (.000007) * R * (R-60) * (100-R);
-		
-	switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(rtp_session->session), SWITCH_LOG_DEBUG3, "%s %s stat %0.2f %ld/%d flaws: %ld mos: %0.2f v: %0.2f %0.2f/%0.2f\n",
+	// hhbb modified SWITCH_LOG_DEBUG1 -> SWITCH_LOG_DEBUG7
+	switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(rtp_session->session), SWITCH_LOG_DEBUG7, "%s %s stat %0.2f %ld/%d flaws: %ld mos: %0.2f v: %0.2f %0.2f/%0.2f\n",
 					  rtp_session_name(rtp_session),
 					  rtp_type(rtp_session),
 					  rtp_session->stats.inbound.R,
@@ -7840,7 +7840,7 @@ static int rtp_common_read(switch_rtp_t *rtp_session, switch_payload_t *payload_
 				if (!rtp_session->flags[SWITCH_RTP_FLAG_PAUSE] && !rtp_session->flags[SWITCH_RTP_FLAG_DTMF_ON] && !rtp_session->dtmf_data.in_digit_ts
 					&& rtp_session->cng_count > (rtp_session->one_second * 2) && rtp_session->jitter_lead > JITTER_LEAD_FRAMES) {
 
-					switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(rtp_session->session), SWITCH_LOG_DEBUG3, "%s %s timeout\n",
+					switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(rtp_session->session), SWITCH_LOG_DEBUG1, "%s %s timeout\n",
 									  rtp_session_name(rtp_session), rtp_type(rtp_session));
 
 					if (rtp_session->media_timeout && rtp_session->last_media) {
