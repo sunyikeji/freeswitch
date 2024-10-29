@@ -4626,7 +4626,7 @@ switch_status_t config_sofia(sofia_config_t reload, char *profile_name)
 
 					profile->pool = pool;
 
-					profile->user_agent = switch_core_sprintf(profile->pool, "dxmediaserver-mod_sofia/%s", switch_version_full());
+					profile->user_agent = switch_core_sprintf(profile->pool, "dxmediaserver-mod_sofia/%s", switch_version_full()); //hhbb modified
 
 					profile->sip_user_ping_max = 3;
 					profile->sip_user_ping_min = 1;
