@@ -354,7 +354,7 @@ static switch_status_t mp4_file_open(switch_file_handle_t *handle, const char *p
 		return SWITCH_STATUS_GENERR;
 	}
 
-	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "sample rate: %d, channels: %d\n", handle->samplerate, handle->channels);
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "sample rate: %d, channels: %d, flags: %d\n", handle->samplerate, handle->channels, flags); //hhbb add flags
 
 	if (context->audio_type == MP4_ULAW_AUDIO_TYPE) {
 		context->audio = MP4AddULawAudioTrack(context->fd, handle->samplerate);

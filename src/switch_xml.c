@@ -1430,6 +1430,7 @@ static int preprocess(const char *cwd, const char *file, FILE *write_fd, int rle
 	int line = 0;
 	switch_size_t len = 0, eblen = 0;
 
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "cwd=[%s], file=[%s], rlevel=[%d]\n",cwd, file, rlevel); //hhbb add
 	if (rlevel > 100) {
 		return -1;
 	}
