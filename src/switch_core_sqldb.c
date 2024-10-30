@@ -688,6 +688,7 @@ static switch_status_t switch_cache_db_execute_sql_real(switch_cache_db_handle_t
 	char *tmp = NULL;
 	char *type = NULL;
 
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG10, "[%s] [%d] SQL RUN[%s]\n", dbh->name, dbh->type, sql); // hhbb add
 	if (err) {
 		*err = NULL;
 	}
@@ -1952,6 +1953,9 @@ SWITCH_DECLARE(switch_status_t) switch_sql_queue_manager_push_confirm(switch_sql
 	if (switch_cache_db_get_db_handle_dsn(&dbh, qm->dsn) == SWITCH_STATUS_SUCCESS) {
 		switch_cache_db_execute_sql(dbh, (char *)sql, NULL);
 		switch_cache_db_release_db_handle(&dbh);
+	}
+	else {
+	    switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "Cannot connect DSN %s\n", qm->dsn); //hhbb add
 	}
 
 	if (!dup) free((char *)sql);
