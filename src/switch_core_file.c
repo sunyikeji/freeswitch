@@ -343,7 +343,7 @@ SWITCH_DECLARE(switch_status_t) switch_core_perform_file_open(const char *file, 
 
 
 	if ((fh->file_interface = switch_loadable_module_get_file_interface(ext, fh->modname)) == 0) {
-		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "Invalid file format [%s] for [%s]!\n", ext, file_path);
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "Invalid file format [%s] for [%s][%s]!\n", ext, file_path, fh->modname);
 		switch_goto_status(SWITCH_STATUS_GENERR, fail);
 	}
 
