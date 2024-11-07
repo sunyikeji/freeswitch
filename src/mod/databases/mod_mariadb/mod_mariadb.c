@@ -665,6 +665,7 @@ switch_status_t mariadb_handle_exec_base_detailed(const char *file, const char *
 {
 	char *err_str = NULL, *er = NULL;
 
+	switch_log_printf(SWITCH_CHANNEL_ID_LOG, file, func, line, NULL, SWITCH_LOG_DEBUG10, "mariadb SQL: [%s]\n", sql); //hhbb add
 	mariadb_flush(handle);
 	handle->affected_rows = 0;
 
