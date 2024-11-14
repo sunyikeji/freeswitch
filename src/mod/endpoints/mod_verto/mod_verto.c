@@ -6687,6 +6687,19 @@ static void presence_event_handler(switch_event_t *event)
 	add_it("callerIDNumber", "caller-caller-id-number");
 	add_it("calleeIDName", "caller-callee-id-name");
 	add_it("calleeIDNumber", "caller-callee-id-number");
+	// hhbb add 2024-11-13
+	//add_it("destinationNumber", "caller-destination-number"); //event destinationNumber
+	tmp = switch_event_get_header(event, "caller-callee-id-number");
+	if(zstr(tmp)) {
+		tmp = switch_event_get_header(event, "caller-destination-number");
+		if(tmp) {
+			cJSON_AddItemToObject(data, "calleeIDNumber", cJSON_CreateString(tmp)); //event calleeIDNumber
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "calleeIDNumber=[%s]\n", tmp);
+		}
+	}
+	add_it("hangupCause", "Hangup-Cause");
+	add_it("eventDateLocal", "Event-Date-Local");
+	// hhbb end
 	add_it("channelUUID", "unique-id");
 
 	add_it("presenceCallDirection", "presence-call-direction");
