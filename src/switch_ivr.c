@@ -3699,6 +3699,7 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_say(switch_core_session_t *session,
 
 	if (zstr(module_name)) {
 		module_name = "en";
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_NOTICE, "module_name null, using [%s]\n", module_name); //hhbb add debug log
 	}
 
 	if (module_name) {
@@ -3711,12 +3712,14 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_say(switch_core_session_t *session,
 			chan_lang = p;
 		}
 	}
+	switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "module_name=[%s],chan_lang=[%s]\n", module_name, chan_lang); //hhbb add debug log
 
 	if (!chan_lang) {
 		lang = switch_channel_get_variable(channel, "language");
-
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "channel language [%s]\n", lang); //hhbb add debug log
 		if (!lang) {
 			chan_lang = switch_channel_get_variable(channel, "default_language");
+			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "channel default_language [%s]\n", chan_lang); //hhbb add debug log
 			if (!chan_lang) {
 				chan_lang = module_name;
 			}
@@ -3818,9 +3821,10 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_say_string(switch_core_session_t *ses
 
 		if (!lang) {
 			lang = switch_channel_get_variable(channel, "language");
-
+			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "channel language [%s]\n", lang); //hhbb add debug log
 			if (!lang) {
 				chan_lang = switch_channel_get_variable(channel, "default_language");
+				switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "channel default_language [%s]\n", chan_lang); //hhbb add debug log
 				if (!chan_lang) {
 					chan_lang = "en";
 				}
@@ -3833,6 +3837,7 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_say_string(switch_core_session_t *ses
 
 	if (!lang) lang = "en";
 	if (!chan_lang) chan_lang = lang;
+	switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "lang=[%s],chan_lang=[%s]\n", lang, chan_lang); //hhbb add debug log
 
 	switch_event_create(&hint_data, SWITCH_EVENT_REQUEST_PARAMS);
 	switch_assert(hint_data);
