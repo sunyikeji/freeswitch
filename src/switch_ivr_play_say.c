@@ -64,6 +64,13 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_phrase_macro_event(switch_core_sessio
 
 	if (!lang) {
 		chan_lang = switch_channel_get_variable(channel, "default_language");
+		//hhbb add
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "channel default_language [%s]\n", chan_lang);
+		if (!chan_lang) {
+			chan_lang = switch_channel_get_variable(channel, "language");
+			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "channel language [%s]\n", chan_lang);
+		}
+		//hhbb end
 		if (!chan_lang) {
 			chan_lang = "en";
 		}
