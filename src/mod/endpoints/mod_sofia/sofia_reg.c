@@ -3084,6 +3084,7 @@ auth_res_t sofia_reg_parse_auth(sofia_profile_t *profile,
 	} else {
 		use_alg = ALG_MD5;
 	}
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "SIP auth hash algorithm=[%s], use_alg=[%d]\n", algorithm, use_alg); //hhbb add debug
 
 	user_agent = (sip && sip->sip_user_agent) ? sip->sip_user_agent->g_string : "unknown";
 
@@ -3337,6 +3338,7 @@ auth_res_t sofia_reg_parse_auth(sofia_profile_t *profile,
 
 	if (!a1_hash) {
 		input = switch_mprintf("%s:%s:%s", username, realm, passwd);
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "input=[%s]\n", input); //hhbb add debug
 
 		if (sofia_make_digest(use_alg, &hexdigest, (void *)input, &digest_outputlen) != SWITCH_STATUS_SUCCESS) {
 			switch_safe_free(input);
@@ -3346,6 +3348,7 @@ auth_res_t sofia_reg_parse_auth(sofia_profile_t *profile,
 		switch_safe_free(input);
 		a1_hash = hexdigest;
 	}
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "a1_hash=[%s]\n", a1_hash); //hhbb add debug
 
 	if (user_agent_filter) {
 		if (switch_regex_match(user_agent, user_agent_filter) == SWITCH_STATUS_SUCCESS) {
@@ -3392,10 +3395,12 @@ auth_res_t sofia_reg_parse_auth(sofia_profile_t *profile,
   for_the_sake_of_interop:
 
 	if ((input = switch_mprintf("%s:%q", regstr, uri))) {
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "input=[%s]\n", input); //hhbb add debug
 		if (sofia_make_digest(use_alg, &uridigest, (void *)input, &digest_outputlen) != SWITCH_STATUS_SUCCESS) {
 			switch_safe_free(input);
 			goto end;
 		}
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "uridigest=[%s]\n", uridigest); //hhbb add debug
 	}
 
 	if (nc && cnonce && qop) {
@@ -3405,10 +3410,12 @@ auth_res_t sofia_reg_parse_auth(sofia_profile_t *profile,
 	}
 
 	if (input2) {
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "input2=[%s]\n", input2); //hhbb add debug
 		if (sofia_make_digest(use_alg, &bigdigest, (void *)input2, &digest_outputlen) != SWITCH_STATUS_SUCCESS) {
 			switch_safe_free(input2);
 			goto end;
 		}
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "bigdigest=[%s]\n", bigdigest); //hhbb add debug
 	}
 
 	if (input2 && !strcasecmp(bigdigest, response)) {
@@ -3424,6 +3431,7 @@ auth_res_t sofia_reg_parse_auth(sofia_profile_t *profile,
 			goto for_the_sake_of_interop;
 		}
 
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "SIP auth forbidden [%s]!=[%s]\n", bigdigest, response); //hhbb add debug
 		ret = AUTH_FORBIDDEN;
 	}
 
