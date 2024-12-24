@@ -3882,6 +3882,7 @@ SWITCH_DECLARE(void) switch_core_media_check_video_codecs(switch_core_session_t 
 	switch_assert(session);
 
 	if (!(smh = session->media_handle)) {
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_WARNING, "session->media_handle null\n");//hhbb add
 		return;
 	}
 
@@ -4033,6 +4034,9 @@ static switch_status_t check_ice(switch_media_handle_t *smh, switch_media_type_t
 	char con_addr[256];
 	int ice_resolve = 0;
 	ip_t ip;
+
+	if(m) switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(smh->session), SWITCH_LOG_DEBUG, "check_ice type=[%d] m_type=[%d] m_port=[%lu]\n", type, m->m_type, m->m_port); //hhbb add
+	else switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(smh->session), SWITCH_LOG_DEBUG, "check_ice type=[%d] m=NULL\n", type); //hhbb add
 
 	if (switch_true(switch_channel_get_variable_dup(smh->session->channel, "ignore_sdp_ice", SWITCH_FALSE, -1))) {
 		return SWITCH_STATUS_BREAK;
@@ -4243,6 +4247,7 @@ static switch_status_t check_ice(switch_media_handle_t *smh, switch_media_type_t
 	}
 
 	if (!ice_seen) {
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(smh->session), SWITCH_LOG_DEBUG, "check_ice ice_seen=[%d] cand_seen=[%d]\n", ice_seen, cand_seen); //hhbb add
 		return SWITCH_STATUS_SUCCESS;
 	}
 
@@ -5773,11 +5778,13 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 					}
 				} else if (switch_core_media_set_codec(session, 0, smh->mparams->codec_flags) != SWITCH_STATUS_SUCCESS) {
 					match = 0;
+					switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_WARNING, "switch_core_media_set_codec false match=0\n"); //hhbb add
 				}
 
 				if (match) {
 					if (check_ice(smh, SWITCH_MEDIA_TYPE_AUDIO, sdp, m) == SWITCH_STATUS_FALSE) {
 						match = 0;
+						switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_WARNING, "check_ice audio false match=0\n"); //hhbb add
 						got_audio = 0;
 					} else {
 						got_audio = 1;
@@ -6012,6 +6019,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 				}
 			}
 
+			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "switch_core_media_negotiate_sdp m_port=[%lu] match=[%d]\n",m->m_port, match);//hhbb add
 			if (!m->m_port) {
 				goto endsdp;
 			}
@@ -6144,13 +6152,16 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 									  rm_encoding, map->rm_pt, imp->iananame, imp->ianacode);
 					if ((zstr(map->rm_encoding) || (smh->mparams->ndlb & SM_NDLB_ALLOW_BAD_IANANAME)) && map->rm_pt < 96) {
 						vmatch = (map->rm_pt == imp->ianacode) ? 1 : 0;
+						switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "switch_core_media_negotiate_sdp vmatch=[%d]\n", vmatch); //hhbb add
 					} else {
 						vmatch = strcasecmp(rm_encoding, imp->iananame) ? 0 : 1;
+						switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "switch_core_media_negotiate_sdp vmatch=[%d]\n", vmatch); //hhbb add
 					}
 
 					if (sdp_type == SDP_ANSWER && consider_video_fmtp && vmatch && !zstr(map->rm_fmtp) && !zstr(smh->fmtps[i])) {
 						almost_vmatch = 1;
 						vmatch = !strcasecmp(smh->fmtps[i], map->rm_fmtp);
+						switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "switch_core_media_negotiate_sdp vmatch=[%d]\n", vmatch); //hhbb add
 					}
 
 					if (vmatch && vmatch_pt) {
@@ -6160,6 +6171,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 							int opt = atoi(other_pt);
 							if (map->rm_pt != opt) {
 								vmatch = 0;
+								switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "switch_core_media_negotiate_sdp vmatch=[%d],rm_pt=[%d], opt=[%d]\n", vmatch, map->rm_pt, opt); //hhbb add
 							} else {
 								if (switch_channel_var_true(channel, "inherit_video_fmtp")) {
 									inherit_video_fmtp = switch_channel_get_variable_partner(channel, "rtp_video_fmtp");
@@ -6191,7 +6203,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 			}
 
 			if (consider_video_fmtp && (!m_idx || almost_vmatch)) {
-				switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "No matches with FTMP, fallback to ignoring FMTP\n");
+				switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "No matches with FTMP, fallback to ignoring FMTP vmatch=[%d]\n", vmatch); //hhbb add
 				almost_vmatch = 0;
 				m_idx = 0;
 				consider_video_fmtp = 0;
@@ -6199,7 +6211,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 			}
 
 			if (vmatch_pt && !m_idx) {
-				switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "No matches with inherit_codec, fallback to ignoring PT\n");
+				switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "No matches with inherit_codec, fallback to ignoring PT vmatch=[%d]\n", vmatch); //hhbb add
 				vmatch_pt = 0;
 				goto compare;
 			}
@@ -6210,6 +6222,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 				m_idx = 0;
 			}
 
+			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "switch_core_media_negotiate_sdp vmatch=[%d],m_idx=[%d]\n", vmatch, m_idx); //hhbb add
 			if (m_idx) {
 				char tmp[50];
 				//const char *mirror = switch_channel_get_variable(session->channel, "rtp_mirror_remote_video_codec_payload");
@@ -6220,6 +6233,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 				}
 
 				vmatch = 1;
+				switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "switch_core_media_negotiate_sdp vmatch=[%d]\n", vmatch); //hhbb add
 				v_engine->codec_negotiated = 1;
 				v_engine->payload_map = NULL;
 
@@ -6282,6 +6296,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 				if (switch_core_media_set_video_codec(session, 0) == SWITCH_STATUS_SUCCESS) {
 					if (check_ice(smh, SWITCH_MEDIA_TYPE_VIDEO, sdp, m) == SWITCH_STATUS_FALSE) {
 						vmatch = 0;
+						switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_WARNING, "check_ice video false vmatch=0\n"); //hhbb add 
 					}
 				}
 			}
@@ -6291,7 +6306,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 	}
 
  endsdp:
-	switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "endsdp: rtcp_auto_audio=[%d],rtcp_auto_video=[%d],saw_audio=[%d]\n",rtcp_auto_audio, rtcp_auto_video, saw_audio);//hhbb add
+	switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "endsdp: rtcp_auto_audio=[%d],rtcp_auto_video=[%d],saw_audio=[%d],saw_video=[%d]\n",rtcp_auto_audio, rtcp_auto_video, saw_audio, saw_video);//hhbb add
 	if (rtcp_auto_audio || rtcp_auto_video) {
 		if (rtcp_auto_audio && !skip_rtcp && !got_audio_rtcp && audio_port) {
 			switch_channel_set_variable_printf(session->channel, "rtp_remote_audio_rtcp_port", "%d", audio_port + 1);
