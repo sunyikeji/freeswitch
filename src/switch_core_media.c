@@ -6128,6 +6128,7 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 					for (attr = m->m_attributes; attr; attr = attr->a_next) {
 						if (!strcasecmp(attr->a_name, "fingerprint") && !zstr(attr->a_value)) {
 							got_video_crypto = 1;
+							switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "switch_core_media_negotiate_sdp got_video_crypto=[%d]\n", got_video_crypto); //hhbb add
 						}
 					}
 				}
@@ -6135,16 +6136,20 @@ SWITCH_DECLARE(uint8_t) switch_core_media_negotiate_sdp(switch_core_session_t *s
 				if (!(rm_encoding = map->rm_encoding)) {
 					rm_encoding = "";
 				}
+				switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "Video Codec [%s:%d]\n", rm_encoding, map->rm_pt); //hhbb add
 
 				for (i = 0; i < total_codecs; i++) {
 					const switch_codec_implementation_t *imp = codec_array[i];
 
+					switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "Codec Array [%s:%d]\n", imp->iananame, imp->ianacode); //hhbb add
 					if (imp->codec_type != SWITCH_CODEC_TYPE_VIDEO) {
+						switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "switch_core_media_negotiate_sdp codec_type=[%d] i=[%d] continue\n", imp->codec_type, i); //hhbb add
 						continue;
 					}
 
 					if (switch_channel_direction(session->channel) == SWITCH_CALL_DIRECTION_INBOUND &&
 						switch_channel_test_flag(session->channel, CF_NOVIDEO)) {
+						switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "switch_core_media_negotiate_sdp SWITCH_CALL_DIRECTION_INBOUND and CF_NOVIDEO i=[%d] continue\n", i); //hhbb add
 						continue;
 					}
 

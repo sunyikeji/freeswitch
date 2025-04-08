@@ -3427,7 +3427,6 @@ static int do_dtls(switch_rtp_t *rtp_session, switch_dtls_t *dtls)
 		}
 	}
 
-	switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(rtp_session->session), SWITCH_LOG_DEBUG8, "do_dtls ret=[%d]\n", r);//hhbb add
 	return r;
 }
 
