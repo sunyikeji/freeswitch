@@ -1,4 +1,3 @@
-applications/mod_abstraction
 applications/mod_av
 applications/mod_avmd
 applications/mod_bert
@@ -32,13 +31,13 @@ applications/mod_memcache
 applications/mod_mongo
 applications/mod_mp4
 applications/mod_nibblebill
-applications/mod_oreka
+#applications/mod_oreka
 #applications/mod_osp
 applications/mod_prefix
 #applications/mod_rad_auth
 applications/mod_redis
 applications/mod_rss
-applications/mod_signalwire
+#applications/mod_signalwire
 applications/mod_sms
 applications/mod_snapshot
 applications/mod_snom
@@ -102,6 +101,7 @@ event_handlers/mod_cdr_sqlite
 event_handlers/mod_erlang_event
 event_handlers/mod_event_multicast
 event_handlers/mod_event_socket
+#event_handlers/mod_fail2ban
 event_handlers/mod_format_cdr
 event_handlers/mod_json_cdr
 event_handlers/mod_kazoo
@@ -160,3 +160,8 @@ xml_int/mod_xml_ldap
 #xml_int/mod_xml_radius
 xml_int/mod_xml_rpc
 xml_int/mod_xml_scgi
+
+#mod_freetdm|https://github.com/freeswitch/freetdm.git -b master
+
+## Experimental Modules (don't cry if they're broken)
+#../../contrib/mod/xml_int/mod_xml_odbc
